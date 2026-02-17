@@ -1,0 +1,40 @@
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse
+
+def get_all_links(url):
+    try:
+        # 1. Fetch the website content
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        links = set() # Use a set to avoid duplicates
+
+        # 2. Find all 'a' tags with an 'href' attribute
+        for a_tag in soup.find_all('a', href=True):
+            link = a_tag['href']
+            
+            # Join relative links (e.g., /about) with the base URL
+            full_url = urljoin(url, link)
+            
+            # Clean the URL (remove fragments like #section1)
+            clean_url = full_url.split('#')[0]
+            
+            # Only keep links belonging to the same domain (optional)
+            if urlparse(clean_url).netloc == urlparse(url).netloc:
+                links.add(clean_url)
+
+        # 3. Save to a file
+        with open("links.txt", "w") as f:
+            for link in sorted(links):
+                f.write(link + "\n")
+        
+        print(f"Success! {len(links)} links saved to links.txt")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+if __name__ == "__main__":
+    target_url = "https://denialjournal.com/"
+    get_all_links(target_url)
