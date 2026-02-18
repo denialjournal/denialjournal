@@ -1,28 +1,3 @@
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
+## 🔗 Links
 
-def generate_github_markdown(target_url):
-    try:
-        response = requests.get(target_url, timeout=10)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        links = set()
-
-        for tag in soup.find_all('a', href=True):
-            url = urljoin(target_url, tag['href'])
-            if "denialjournal.com" in url: # Only keep internal links
-                links.add(url)
-
-        # Create Markdown file for GitHub
-        with open("BACKLINKS.md", "w") as f:
-            f.write(f"# Backlinks for {target_url}\n\n")
-            f.write("Below is a list of all discovered internal links:\n\n")
-            for link in sorted(links):
-                f.write(f"* [{link}]({link})\n")
-        
-        print("File 'BACKLINKS.md' created successfully!")
-
-    except Exception as e:
-        print(f"Error: {e}")
-
-generate_github_markdown("https://denialjournal.com/")
+- https://github.com/camnon33/backlinks2off
